@@ -82,6 +82,10 @@ int main(void)
         printf("index %d: coef %d,exponent %d\n",i,value.coeficient,value.exponent);
     }
 
+    list3.Reverse();
+    polynominalOutput(&list3,buf);
+    printf("%s\n",buf);
+
 
     return 1;
 }
@@ -214,6 +218,115 @@ Err_t polynominalInput(char* buf,CList<polynominal_t>* equation)
 
 Err_t polynominalOutput(CList<polynominal_t>* input,char* output)
 {
+    char* p;
+    polynominal_t value;
+    AM_U32 len;
+    AM_U32 flag;
+    char buf[30];
+
+    if((input==NULL)||(output==NULL))
+        return INVALIDE_PARAMET;
+
+    p=output;
+    memcpy(p,"F(x)=",strlen("F(x)="));
+    p+=strlen("F(x)=");
+    input->ResetElemNext();
+    input->GetElemNext(&value);
+
+    /********************************
+    *   Process the first element
+    ********************************/
+    if((value.coeficient==1)&&(value.exponent==0))
+    {
+        *p++='1';
+        goto SecondProcess;
+    }
+
+    if(value.coeficient>1)
+    {
+        sprintf(buf,"%d",value.coeficient);
+        memcpy(p,buf,strlen(buf));
+        p+=strlen(buf);
+    }
+    else if(value.coeficient<0)
+    {
+        sprintf(buf,"%d",value.coeficient);
+        memcpy(p,buf,strlen(buf));
+        p+=strlen(buf);
+    }
+
+    if(value.exponent==0)
+    {
+        goto SecondProcess;
+    }
+    else if(value.exponent==1)
+    {
+        *p++='X';
+        goto SecondProcess;
+    }
+    else
+    {
+        *p++='X';
+        *p++='^';
+        sprintf(buf,"%d",value.exponent);
+        memcpy(p,buf,strlen(buf));
+        p+=strlen(buf);
+        goto SecondProcess;
+    }
+    /**********************************************
+    *   Process other elements exclude the first
+    **********************************************/
+SecondProcess:
+    while(input->GetElemNext(&value)==RETURN_SUCCESS)
+    {
+        memset(buf,0,30);
+
+        /*****************************
+        *   Process the coeficient
+        *****************************/
+        if(value.coeficient==1)
+        {
+            *p++='+';
+        }
+        else if(value.coeficient>1)
+        {
+            *p++='+';
+            sprintf(buf,"%d",value.coeficient);
+            memcpy(p,buf,strlen(buf));
+            p+=strlen(buf);
+        }
+        else if(value.coeficient<0)
+        {
+            sprintf(buf,"%d",value.coeficient);
+            memcpy(p,buf,strlen(buf));
+            p+=strlen(buf);
+        }
+
+        /*****************************
+        *   Process the exponent
+        *****************************/
+        if(value.exponent==0)
+        {
+            continue;
+        }
+        else if(value.exponent==1)
+        {
+            *p++='X';
+            continue;
+        }
+        else
+        {
+            *p++='X';
+            *p++='^';
+            sprintf(buf,"%d",value.exponent);
+            memcpy(p,buf,strlen(buf));
+            p+=strlen(buf);
+            continue;
+        }
+    }
+
+    *p='\0';
+    return RETURN_SUCCESS;
 }
 
 Err_t polynominalAdd(CList<polynominal_t>* input1,CList<polynominal_t>* input2,CList<polynominal_t>* output)

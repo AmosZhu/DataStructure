@@ -242,13 +242,13 @@ Err_t polynominalOutput(CList<polynominal_t>* input,char* output)
         goto SecondProcess;
     }
 
-    if(value.coeficient>1)
+    if(value.coeficient==1)
     {
-        sprintf(buf,"%d",value.coeficient);
-        memcpy(p,buf,strlen(buf));
-        p+=strlen(buf);
+        /***************************
+        *   Do not do anything
+        ***************************/
     }
-    else if(value.coeficient<0)
+    else
     {
         sprintf(buf,"%d",value.coeficient);
         memcpy(p,buf,strlen(buf));
@@ -367,7 +367,8 @@ Err_t polynominalAdd(CList<polynominal_t>* input1,CList<polynominal_t>* input2,C
         {
             o3.coeficient=p1.coeficient+p2.coeficient;
             o3.exponent=p1.exponent;
-            output->Insert(o3);
+            if(o3.coeficient!=0) /*if the coeficient is zero, do not add it to the list*/
+                output->Insert(o3);
             if(input1->GetElemNext(&p1)!=RETURN_SUCCESS)
                 goto ProcessList2;
 

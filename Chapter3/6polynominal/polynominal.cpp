@@ -329,6 +329,13 @@ SecondProcess:
     return RETURN_SUCCESS;
 }
 
+/***********************************************************************************************
+*
+*   Traverse both list,if input1 has M elments and the input2 has N elemnts;
+*
+*   Time cost O(M+N);
+*
+***********************************************************************************************/
 Err_t polynominalAdd(CList<polynominal_t>* input1,CList<polynominal_t>* input2,CList<polynominal_t>* output)
 {
     polynominal_t p1,p2,o3;

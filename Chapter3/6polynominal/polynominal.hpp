@@ -26,8 +26,6 @@ typedef struct POLYNOMINAL_TYPE
 #define INITVALUE(value) value.coeficient=1;\
                             value.exponent=0;
 
-
-AM_U32 processDigit(char* fmt);
 Err_t polynominalInput(char* buf,CList<polynominal_t>* equation);
 Err_t polynominalOutput(CList<polynominal_t>* input,char* output);
 Err_t polynominalAdd(CList<polynominal_t>* input1,CList<polynominal_t>* input2,CList<polynominal_t>* output);

@@ -8,6 +8,7 @@
 #define ISDIGIT(x) (('0'<=x)&&('9'>=x))
 #define ISPARTHES_L(x) (x=='(')
 #define ISPARTHES_R(x) (x==')')
+#define ISPOW(x) (x=='^')
 
 
 /*

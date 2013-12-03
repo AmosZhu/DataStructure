@@ -5,7 +5,7 @@
 *
 *******************************************************************/
 
-
+#include <math.h>
 #include "AmosType.hpp"
 #include "RPNCalculate.hpp"
 #include "CStack.hpp"
@@ -34,7 +34,7 @@ Err_t RPNCalculate(char* expression,AM_S32* result)
     char* p;
     char opIn;
     char opOut;
-    AM_S32 value;
+    AM_S32 value,exp;
     AM_S32 v1,v2;
     CStack<char> opStack;  /*Store the operation*/
     CStack<AM_S32> numStack; /*Store the numbers*/
@@ -72,6 +72,23 @@ Err_t RPNCalculate(char* expression,AM_S32* result)
                 numStack.Push(&value);
             }
             p++;
+            continue;
+        }
+
+        if(ISPOW(*p)) /*Maybe a exponent */
+        {
+            p++;
+            if(ISDIGIT(*p))
+            {
+                exp=processDigit(&p);
+            }
+            else
+            {
+                return INVALIDE_PARAMET;
+            }
+            numStack.Pop(&v1);
+            value=(AM_S32)pow(v1,exp);
+            numStack.Push(&value);
             continue;
         }
 

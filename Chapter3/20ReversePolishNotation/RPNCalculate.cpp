@@ -139,6 +139,102 @@ Err_t RPNCalculate(char* expression,AM_S32* result)
     return RETURN_SUCCESS;
 }
 
+Err_t RPNTranslate(char* expression,rpn_t* result)
+{
+    char* p;
+    char opIn;
+    char opOut;
+    AM_S32 value,exp;
+    AM_S32 v1,v2;
+    CStack<char> opStack;  /*Store the operation*/
+    struct rpn_t * idx=result;
+
+    if((expression==NULL)||(result==NULL))
+        return INVALIDE_PARAMET;
+
+    p=expression;
+
+    while(*p)
+    {
+        if(ISDIGIT(*p))/*Process digit*/
+        {
+            value=processDigit(&p);
+            idx->value=value;
+            idx->type=TYPE_NUMBER;
+            idx++;
+            continue;
+        }
+
+        if(ISPARTHES_L(*p)) /*Not a digit ,maybe a left parentheses*/
+        {
+            opStack.Push(p);
+            p++;
+            continue;
+        }
+
+        if(ISPARTHES_R(*p)) /*Maybe a right parentheses*/
+        {
+            while((opStack.Pop(&opOut)==RETURN_SUCCESS)&&(!ISPARTHES_L(opOut))&&(!opStack.IsEmpty()))
+            {
+                idx->value=opOut;
+                idx->type=TYPE_OP;
+                idx++;
+            }
+            p++;
+            continue;
+        }
+
+#if 0
+        if(ISPOW(*p)) /*Maybe a exponent */
+        {
+            p++;
+            if(ISDIGIT(*p))
+            {
+                exp=processDigit(&p);
+            }
+            else
+            {
+                return INVALIDE_PARAMET;
+            }
+            numStack.Pop(&v1);
+            value=(AM_S32)pow(v1,exp);
+            numStack.Push(&value);
+            continue;
+        }
+#endif /* Modify by Amos.zhu */
+
+        while((!opStack.IsEmpty())\
+              &&(opStack.Top(&opOut)==RETURN_SUCCESS)&&(!ISPARTHES_L(opOut))\
+              &&(priorityCmp(opOut,*p)==TRUE)) /*A normal operator,pop out the operator which */
+        {
+            opStack.Pop(&opOut);
+            idx->value=opOut;
+            idx->type=TYPE_OP;
+            idx++;
+        }
+        opStack.Push(p);
+        p++;
+        continue;
+    }
+
+    /*
+    *   Some operator may still in the stack
+    */
+
+    while(!opStack.IsEmpty())
+    {
+        opStack.Pop(&opOut);
+        idx->value=opOut;
+        idx->type=TYPE_OP;
+        idx++;
+    }
+
+    idx->type=TYPE_NULL;
+
+    return RETURN_SUCCESS;
+}
+
+
 static AM_S32 calculate(AM_S32 v1,AM_S32 v2,char op)
 {
     AM_S32 ret=INFINITY;

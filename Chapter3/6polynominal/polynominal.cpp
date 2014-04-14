@@ -38,6 +38,12 @@ static AM_U32 processDigit(char* fmt);
 *               Text
 ***************************************/
 
+static void copyFunc(polynominal_t* dst,polynominal_t* src)
+{
+    memcpy(dst,src,sizeof(polynominal_t));
+}
+
+
 AM_U32 processDigit(char** fmt)
 {
     AM_U32 num=0;
@@ -95,7 +101,7 @@ Err_t polynominalInput(char* buf,CList<polynominal_t>* equation)
                 else
                 {
                     value.exponent=1;
-                    equation->Insert(value);
+                    equation->Insert(&value);
                     INITVALUE(value);
                     CLEARFLAG(flag);
                 }
@@ -129,7 +135,7 @@ Err_t polynominalInput(char* buf,CList<polynominal_t>* equation)
         if(flag&EXPONENT)
         {
             value.exponent=num;
-            equation->Insert(value);
+            equation->Insert(&value);
             INITVALUE(value);
             CLEARFLAG(flag);
         }
@@ -153,7 +159,7 @@ Err_t polynominalInput(char* buf,CList<polynominal_t>* equation)
             else
             {
                 value.exponent=0;
-                equation->Insert(value);
+                equation->Insert(&value);
                 INITVALUE(value);
                 CLEARFLAG(flag);
             }
@@ -321,7 +327,7 @@ Err_t polynominalAdd(CList<polynominal_t>* input1,CList<polynominal_t>* input2,C
         {
             o3.coeficient=p1.coeficient;
             o3.exponent=p1.exponent;
-            output->Insert(o3);
+            output->Insert(&o3);
             if(input1->GetElemNext(&p1)!=RETURN_SUCCESS)
                 goto ProcessList2;
 
@@ -330,7 +336,7 @@ Err_t polynominalAdd(CList<polynominal_t>* input1,CList<polynominal_t>* input2,C
         {
             o3.coeficient=p2.coeficient;
             o3.exponent=p2.exponent;
-            output->Insert(o3);
+            output->Insert(&o3);
             if(input2->GetElemNext(&p2)!=RETURN_SUCCESS)
                 goto ProcessList1;
         }
@@ -339,7 +345,7 @@ Err_t polynominalAdd(CList<polynominal_t>* input1,CList<polynominal_t>* input2,C
             o3.coeficient=p1.coeficient+p2.coeficient;
             o3.exponent=p1.exponent;
             if(o3.coeficient!=0) /*if the coeficient is zero, do not add it to the list*/
-                output->Insert(o3);
+                output->Insert(&o3);
             if(input1->GetElemNext(&p1)!=RETURN_SUCCESS)
                 goto ProcessList2;
 
@@ -357,12 +363,12 @@ ProcessList1:
     o3.coeficient=p1.coeficient;
     o3.exponent=p1.exponent;
     if(o3.coeficient!=0)
-        output->Insert(o3);
+        output->Insert(&o3);
     while(input1->GetElemNext(&p1)==RETURN_SUCCESS)
     {
         o3.coeficient=p1.coeficient;
         o3.exponent=p1.exponent;
-        output->Insert(o3);
+        output->Insert(&o3);
     }
     output->Reverse();  // Keep inorder
     return RETURN_SUCCESS;
@@ -370,13 +376,13 @@ ProcessList2:
     o3.coeficient=p2.coeficient;
     o3.exponent=p2.exponent;
     if(o3.coeficient!=0)
-        output->Insert(o3);
+        output->Insert(&o3);
 
     while(input2->GetElemNext(&p2)==RETURN_SUCCESS)
     {
         o3.coeficient=p2.coeficient;
         o3.exponent=p2.exponent;
-        output->Insert(o3);
+        output->Insert(&o3);
     }
     output->Reverse(); // Keep inorder
     return RETURN_SUCCESS;
@@ -396,6 +402,9 @@ ProcessList2:
 Err_t polynominalMutiply(CList<polynominal_t>* input1,CList<polynominal_t>* input2,CList<polynominal_t>* output)
 {
     CList<polynominal_t> *m,*n,result1,result2,result3;
+    result1.SetCopyFunc(copyFunc);
+    result2=result1;
+    result3=result1;
     polynominal_t value;
     if((input1==NULL)||(input2==NULL)||(output==NULL))
         return INVALIDE_PARAMET;
@@ -471,7 +480,7 @@ static Err_t mutiplySingle(polynominal_t* a1,CList<polynominal_t>* input,CList<p
 #if(DEBUG)
         DB_PRINT("value.coeficient=%d,value.exponent=%d",value.coeficient,value.exponent);
 #endif
-        output->Insert(value);
+        output->Insert(&value);
     }
     output->Reverse(); //Keep inorder
 

@@ -4,11 +4,21 @@
 #include <stdio.h>
 #include <string.h>
 
+
+static void copyFunc(polynominal_t* dst,polynominal_t* src)
+{
+    memcpy(dst,src,sizeof(polynominal_t));
+}
+
 int main(void)
 {
     char buf[BUFSIZE];
     char* equation;
     CList<polynominal_t> list1,list2,list3;
+    list1.SetCopyFunc(copyFunc);
+
+    list2=list1;
+    list3=list1;
     polynominal_t value;
     FILE* fp;
     int i;
